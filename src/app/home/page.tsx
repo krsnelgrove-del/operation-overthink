@@ -13,7 +13,6 @@ export default function Home() {
   const [initCode, setInitCode] = useState(0);
   const [firstRun, setFirstRun] = useState(false);
   const [animationKey, setAnimationKey] = useState(0);
-  const [attemptsCount, setAttemptsCount] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hintActive, setHintActive] = useState(false);
   const [alertMessage, setAlertMessage] = useState<React.ReactNode>("");
@@ -33,24 +32,35 @@ export default function Home() {
 
   const handleCodeSubmit = async (code: string, event: React.SubmitEvent) => {
     event.preventDefault();
-    
     setInputCode(code);
 
-    let newAttempts: number = attemptsCount + 1;
-    setAttemptsCount(newAttempts);
-
+    //correct
     if (code.toString() === initCode.toString()) {
-      //seamless snapshotted transition with push
-      if(!document.startViewTransition) {
-      router.push("/dashboard");
+      
+      await fetch("/api/attemptsMetric", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "correct" }),
+      });
+
+      if(document.startViewTransition()) {
+        document.startViewTransition(async () => {
+          await router.push("/dashboard");
+        })
+      }
+      else {
+        router.push("/dashboard");
+      }
       return;
       }
+      else {
+      //incorrect
+      await fetch("/api/attemptsMetric", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "incorrect" }),
+      });
 
-      document.startViewTransition(() => {
-        router.push("/dashboard");
-      })
-
-    } else {
       setAlertMessage("Perhaps you need a little hint? Press 'Hint' for a... hint");
       
       setAnimationKey((prev) => prev + 1);
@@ -74,6 +84,28 @@ export default function Home() {
       setInitCode(GenerateRandomInt());
       setFirstRun(true);
     }
+
+    let visitorId = localStorage.getItem("visitor_id");
+
+    if(!visitorId) {
+        visitorId = `usr_${Math.random().toString(36).substring(2, 11)}`;
+        localStorage.setItem("visitor_id", visitorId);
+      }
+
+      fetch("api/activeUsers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json"},
+        body: JSON.stringify({ visitorId }),
+    }).catch((err) => console.error("Could not report online presence:", err));
+
+    const handleUnload = () => {
+    const load = JSON.stringify({ visitorId });
+    const blob = new Blob([load], { type: "application/json" });
+
+    navigator.sendBeacon("/api/activeUsers", blob);
+    }
+
+      window.addEventListener("beforeunload", handleUnload);
   });
 
 return (

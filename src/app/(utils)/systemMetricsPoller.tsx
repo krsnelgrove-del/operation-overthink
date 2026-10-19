@@ -37,7 +37,7 @@ export function SystemMetricsPoller() {
         });
       } catch (err: any) {
         if (err.name !== "AbortError") {
-          console.error("Metrics polling failed:", err);
+          console.error("Network metrics polling failed:", err);
         }
       }
     };
@@ -61,7 +61,7 @@ export function SystemMetricsPoller() {
         });
       } catch (err: any) {
         if (err.name !== "AbortError") {
-          console.error("Metrics polling failed:", err);
+          console.error("Visitor metrics polling failed:", err);
         }
       }
     };
@@ -86,7 +86,7 @@ export function SystemMetricsPoller() {
         });
 
         console.log("Memory metrics updated:", data); // Debugging line
-        
+
       } catch (err: any) {
         if (err.name !== "AbortError") {
           console.error("Metrics polling failed:", err);
@@ -94,18 +94,107 @@ export function SystemMetricsPoller() {
       }
     };
 
+    const attemptsPoll = async () => {
+      try {
+        const response = await fetch("/api/attemptsMetric", {
+          signal: controller.signal,
+          cache: "no-store",
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`HTTP error 500 thrown:  ${response.status}: ${errorText}`);
+}
+
+        const data = await response.json();
+
+        batchUpdate({
+          correctAttempts: data.correctAttempts,
+          incorrectAttempts: data.incorrectAttempts,
+        });
+
+        console.log("Attempts metrics updated:", data); // Debugging line
+
+      } catch (err: any) {
+        if (err.name !== "AbortError") {
+          console.error("Attempts metric polling failed:", err);
+        }
+      }
+    };
+
+    const activeUsersPoll = async () => {
+      try {
+        const response = await fetch("/api/activeUsers", {
+          signal: controller.signal,
+          cache: "no-store",
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`HTTP error 500 thrown:  ${response.status}: ${errorText}`);
+}
+
+        const data = await response.json();
+
+        batchUpdate({
+          activeUsers: data.activeUsers,
+        });
+
+        console.log("Attempts metrics updated:", data); // Debugging line
+
+      } catch (err: any) {
+        if (err.name !== "AbortError") {
+          console.error("Active Users metric polling failed:", err);
+        }
+      }
+    };
+
+    const demographicPoll = async () => {
+      try {
+      const response = await fetch("/api/demographicMetric", {
+        signal: controller.signal,
+        cache:"no-store",
+      });
+
+      if(!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP error 500 thrown: ${response.status}: ${errorText}`);
+      }
+
+      const data = await response.json();
+
+      batchUpdate({
+        demographic: data.demographic,
+      })
+      } catch (err: any) {
+        if (err.name !== "AbortError") {
+          console.error("Demographic metrics polling failed:", err);
+        }
+      }
+    }
+
     networkPoll(); // Run immediately on mount
     visitorPoll(); // Run immediately on mount
     memoryPoll(); // Run immediately on mount
+    attemptsPoll(); // Run immediately on mount
+    activeUsersPoll(); // Run immediately on mount
+    demographicPoll(); // Run immediately on mount
 
     const interval = setInterval(() => {
       networkPoll();
       memoryPoll();
     }, 1000); // Poll every 1 second
 
+    const delayedInterval = setInterval(() => {
+      attemptsPoll();
+      activeUsersPoll();
+      demographicPoll();
+    }, 5000); // Poll every 5 second
+
     return () => {
       controller.abort();
       clearInterval(interval);
+      clearInterval(delayedInterval);
     };
   }, [mounted, batchUpdate]);
 

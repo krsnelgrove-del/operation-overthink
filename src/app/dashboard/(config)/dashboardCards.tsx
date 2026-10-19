@@ -5,10 +5,10 @@ import {
   ActiveSessionsCard,
   DataTrackerCard,
   DecryptionEfficiencyCard,
-  ServerLoadCard,
 } from "@/components/cards";
 
 import serverLatencyCard from "@/components/cards/serverLatency";
+import DemographicMap from "@/components/cards/demographicMap";
 
 export interface CardConfig {
   id: string;
@@ -26,7 +26,6 @@ export interface LatencyDataPoint {
 
 
 export const DashboardCards: CardConfig[] = [  
-  
   {
     id: "breach-attempts",
     title: "Breach Attempts",
@@ -58,10 +57,10 @@ export const DashboardCards: CardConfig[] = [
     initialData: { pingMs: 18},
   },
   {
-    id: "server-load",
-    title: "Server Load",
-    component: ServerLoadCard,
-    initialData: { cpuUsage: 68 },
+    id: "demographic-map",
+    title: "Demographic Map",
+    component: DemographicMap,
+    initialData: {},
   },
 ];
 
