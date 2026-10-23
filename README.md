@@ -91,4 +91,4 @@ During development and code review, several architectural constraints and edge c
 * **Next Steps:** 
   1. Refactor query endpoints to eliminate read-side mutations.
   2. Implement comprehensive automated integration testing for telemetry endpoints.
-  3. Explore WebSockets for sub-second streaming metrics.
+  3. Explore WebSockets for sub-second streaming metrics !*******!
