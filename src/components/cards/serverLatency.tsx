@@ -1,4 +1,5 @@
-// components/serverLoad.tsx
+"use client"
+
 import React from 'react';
 import { LatencyBadge } from "@/components/latencyBadge";
 import LatencyGraph from '../latencyGraph';

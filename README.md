@@ -1,8 +1,8 @@
-# Codecrackproject — Engineering Portfolio README
+# Operation-Overthink — Engineering Portfolio README
 
 ## 1. Project Overview
 
-**Codecrackproject** is a full-stack, real-time analytics and telemetry dashboard built with Next.js App Router, React, TypeScript, and PostgreSQL. 
+**Operation-Overthink** is a full-stack, real-time analytics and telemetry dashboard built with Next.js App Router, React, TypeScript, and PostgreSQL. 
 
 The project explores the engineering challenges of building high-frequency client-server telemetry systems. It implements a reactive dashboard that tracks visitor activity, system resource utilization, user demographics, and application interaction metrics through dynamic polling and state orchestration. Designed as both a performance playground and a diagnostic interface, Codecrackproject demonstrates production-aligned patterns for data aggregation, asynchronous state management, and real-time visualization.
 
@@ -32,7 +32,7 @@ The project explores the engineering challenges of building high-frequency clien
 
 ## 4. Architecture & Data Flow
 
-Codecrackproject adopts a decoupled client-server pattern where browser-side polling hooks query Next.js Route Handlers, updating a centralized global state store that drives the UI.
+Operation-Overthink adopts a decoupled client-server pattern where browser-side polling hooks query Next.js Route Handlers, updating a centralized global state store that drives the UI.
 
 ```text
 Home page / visitor activity

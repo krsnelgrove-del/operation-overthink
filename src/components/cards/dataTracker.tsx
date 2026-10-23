@@ -1,3 +1,5 @@
+"use client"
+
 import { useDashboardStore } from "@/app/(utils)/useMetricsStore";
 
 // components/dataTracker.tsx

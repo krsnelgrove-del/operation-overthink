@@ -1,3 +1,5 @@
+"use client"
+
 import React from 'react';
 import { Button } from 'react-aria-components';
 import { cn } from "@/lib/utils"; 

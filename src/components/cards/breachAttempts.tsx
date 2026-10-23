@@ -1,3 +1,5 @@
+"use client"
+
 import { useDashboardStore } from '@/app/(utils)/useMetricsStore';
 import { useEffect, useState } from 'react';
 interface Props {

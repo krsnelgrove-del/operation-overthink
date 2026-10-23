@@ -1,4 +1,5 @@
-// components/serverLoad.tsx
+"use client"
+
 import React, { useEffect, useState } from 'react';
 import { CountryOfOrigin, useDashboardStore } from '@/app/(utils)/useMetricsStore';
 import { data } from 'motion/react-client';

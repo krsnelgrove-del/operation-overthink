@@ -1,4 +1,4 @@
-// components/serverLoad.tsx
+"use client"
 import { useDashboardStore } from '@/app/(utils)/useMetricsStore';
 import React from 'react';
 
