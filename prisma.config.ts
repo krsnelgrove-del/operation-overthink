@@ -10,7 +10,7 @@ export default definePrismaConfig({
     output: "./src/prisma",
     
     db: { 
-      connection: "postgresql://postgres.ggurnjxifrnongninhoq:9531823Pp!239854tHi@aws-0-us-east-2.pooler.supabase.com:6543/postgres?pgbouncer=true"
+      connection: process.env.DATABASE_URL,
     },
   }),
 });
