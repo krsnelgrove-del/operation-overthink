@@ -1,6 +1,7 @@
 import { db } from "@/prisma/db";
 import { NextResponse } from "next/server";
 
+
 export async function GET() {
   try {
     const metric = await db.orm.public.Attempts.where({ id: "global" }).first();

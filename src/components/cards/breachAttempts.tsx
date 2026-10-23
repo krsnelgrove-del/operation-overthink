@@ -1,6 +1,5 @@
 import { useDashboardStore } from '@/app/(utils)/useMetricsStore';
-
-
+import { useEffect, useState } from 'react';
 interface Props {
   title?: string;
   data?: {
@@ -11,7 +10,6 @@ interface Props {
 }
 
 export default function BreachAttemptsCard({ title, data }: Props) {  
-
     const breachAttempts = useDashboardStore((state) => state.visitCount);
     const countDisplay =
     typeof breachAttempts === "object" && breachAttempts !== null

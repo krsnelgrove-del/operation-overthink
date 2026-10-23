@@ -23,7 +23,7 @@ console.log("Demograph Map data to hit UI: ", demographicMapAggregate);
         {(demographicMapAggregate ?? []).map((value) => {
 
         return(
-          <p key={value.origin}>{value.origin}: {value.count}</p>
+          <p key={value.origin ?? "NaN"}>{value.origin ?? "NaN"}: {value.count ?? 0}</p>
         )})}
       </div>
     </div>

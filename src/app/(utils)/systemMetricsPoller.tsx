@@ -44,27 +44,23 @@ export function SystemMetricsPoller() {
 
     const visitorPoll = async () => {
       try {
-        const response = await fetch("/api/visitorCount", {
-          signal: controller.signal,
-          cache: "no-store",
-        });
+        const hasVisited = localStorage.getItem("has_visited_site");
+        if (!hasVisited) {
 
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`HTTP error 500 thrown:  ${response.status}: ${errorText}`);
+          fetch("/api/metrics", { method: "POST", cache: "no-store" })
+          .then((res) => res.json())
+          .then((data) => {
+            batchUpdate({ visitCount: data.visitCount });
+          }).catch((err) => console.error("Failed to increment unique visit:", err));
+          
+          localStorage.setItem("has_visited_site", "true");
 }
-
-        const data = await response.json();
-
-        batchUpdate({
-          visitCount: data.visitCount,
-        });
-      } catch (err: any) {
+      }
+    catch (err: any) {
         if (err.name !== "AbortError") {
           console.error("Visitor metrics polling failed:", err);
         }
-      }
-    };
+      }}
 
     const memoryPoll = async () => {
       try {
@@ -173,6 +169,8 @@ export function SystemMetricsPoller() {
       }
     }
 
+    const hasVisited = localStorage.getItem("has_visited");
+  
     networkPoll(); // Run immediately on mount
     visitorPoll(); // Run immediately on mount
     memoryPoll(); // Run immediately on mount
