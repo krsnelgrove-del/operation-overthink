@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   const formatMB = (bytes?: number) =>
-    bytes ? `${(bytes / 1024 / 1024).toFixed(2)} MB` : "N/A";
+    bytes ? `${(bytes / 1024 / 1024).toFixed(2)}` : 0;
 
   try {
     // Get native Node.js server memory usage metrics

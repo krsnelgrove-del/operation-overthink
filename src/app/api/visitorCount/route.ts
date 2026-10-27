@@ -10,9 +10,6 @@ export async function GET() {
     return NextResponse.json(
       {
         visitCount: existing?.count ?? 0,
-      },
-      {
-        headers: { "Cache-Control": "no-store, max-age=0" },
       }
     );
   } catch (error) {
@@ -42,9 +39,6 @@ export async function POST() {
     return NextResponse.json(
       {
         visitCount: metric.count,
-      },
-      {
-        headers: { "Cache-Control": "no-store, max-age=0" },
       }
     );
   } catch (error) {

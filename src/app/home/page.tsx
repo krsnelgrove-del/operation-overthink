@@ -8,7 +8,11 @@ import FloatingAnimation from "@/components/animations/Floating_Animations";
 
 import AlertCard from "@/components/cards/alertCard";
 
-export default function Home() {
+    interface Props {
+        serverInfo: React.ReactNode;
+}
+
+export default function Home({serverInfo}: Props) {
   const [inputCode, setInputCode] = useState("");
   const [initCode, setInitCode] = useState(0);
   const [firstRun, setFirstRun] = useState(false);

@@ -9,6 +9,7 @@ import {
 
 import serverLatencyCard from "@/components/cards/serverLatency";
 import DemographicMap from "@/components/cards/demographicMap";
+import { useDashboardStore } from "@/app/(utils)/useMetricsStore";
 
 export interface CardConfig {
   id: string;
@@ -30,7 +31,7 @@ export const DashboardCards: CardConfig[] = [
     id: "breach-attempts",
     title: "Breach Attempts",
     component: BreachAttemptsCard,
-    initialData: { totalAttempts: 142 },
+    initialData: { totalAttempts: (() => {useDashboardStore((state) => state.visitCount)})},
   },
   {
     id: "active-sessions",
@@ -54,7 +55,7 @@ export const DashboardCards: CardConfig[] = [
     id: "server-latency",
     title: "Server Latency",
     component: serverLatencyCard,
-    initialData: { pingMs: 18},
+    initialData: { pingMs: (() => {useDashboardStore((state) => state.latency)})},
   },
   {
     id: "demographic-map",

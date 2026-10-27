@@ -16,7 +16,7 @@ export default function BreachAttemptsCard({ title, data }: Props) {
     const activeUsersCount = useDashboardStore((state) => state.activeUsers);
 
   return (
-    <div className="p-4 text-white">
+    <div className="w-full h-full p-4 text-white bg-[#0d1520]/80">
       <h3 className="text-xs font-mono text-zinc-400 uppercase tracking-wider">
         {title}
       </h3>

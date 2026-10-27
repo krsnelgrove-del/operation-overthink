@@ -14,8 +14,9 @@ interface UseMetricsStore {
   memoryUsage: number | null;
   memoryMax: number | null;
   demographic: CountryOfOrigin[] | null,
-  serverLatency: number | null;
-  activeUsers: number | null;
+  serverLatency: number | null,
+  serverCountry: string,
+  activeUsers: number | null,
   
   batchUpdate: (updates: Partial<Omit<UseMetricsStore, "setMetric" | "batchUpdate">>) => void;
 }
@@ -31,7 +32,8 @@ export const useDashboardStore = create<UseMetricsStore>((set) => ({
   memoryMax: null,
   demographic: null,
   serverLatency: null,
-  activeUsers: 0,
+  serverCountry: "",
+  activeUsers: null,
 
   setMetric: (key: any, value: any) => set((state) => ({ ...state, [key]: value })),
   batchUpdate: (updates) => set((state) => ({ ...state, ...updates })),

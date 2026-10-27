@@ -17,7 +17,7 @@ const incorrectAttempts = useDashboardStore((state) => state.incorrectAttempts);
 const totalAttempts = ((correctAttempts ?? 0) + (incorrectAttempts ?? 0));
 
   return (
-    <div className="p-4 text-white">
+    <div className="w-full h-full p-4 text-white bg-[#0d1520]/80">
       <h3 className="text-xs font-mono text-zinc-400 uppercase tracking-wider">
         {title}
       </h3>

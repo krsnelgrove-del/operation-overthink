@@ -47,18 +47,25 @@ export function SystemMetricsPoller() {
         const hasVisited = localStorage.getItem("has_visited_site");
         if (!hasVisited) {
 
-          fetch("/api/metrics", { method: "POST", cache: "no-store" })
+          fetch("/api/visitorCount", { method: "POST", cache: "no-store" })
           .then((res) => res.json())
           .then((data) => {
             batchUpdate({ visitCount: data.visitCount });
           }).catch((err) => console.error("Failed to increment unique visit:", err));
           
           localStorage.setItem("has_visited_site", "true");
-}
+        }
+        else {
+          fetch("/api/visitorCount", { method: "GET", cache: "no-store" })
+          .then((res) => res.json())
+          .then((data) => {
+            batchUpdate({ visitCount: data.visitCount });
+          }).catch((err) => console.error("Failed to increment unique visit:", err));
+        }
       }
     catch (err: any) {
         if (err.name !== "AbortError") {
-          console.error("Visitor metrics polling failed:", err);
+          console.error("Visitorp metrics polling failed:", err);
         }
       }}
 
@@ -169,6 +176,33 @@ export function SystemMetricsPoller() {
       }
     }
 
+    const serverDataPoll = async () => {
+    try {
+      const response = await fetch("/api/serverInfo", {
+          method: "GET",
+          signal: controller.signal,
+          cache: "no-store",
+      });
+
+      if (!response.ok) {
+          const errorText = await response.text();
+            console.warn(`Server metrics stream paused (${response.status}): ${errorText}`);
+      }
+      
+      const data = await response.json();
+
+        batchUpdate({
+          serverCountry: data.country,
+        });
+
+      } catch (err: any) {
+        if (err.name !== "AbortError") {
+          console.error("Server data metric polling failed:", err);
+        }
+      }
+
+    }
+
     const hasVisited = localStorage.getItem("has_visited");
   
     networkPoll(); // Run immediately on mount
@@ -177,6 +211,7 @@ export function SystemMetricsPoller() {
     attemptsPoll(); // Run immediately on mount
     activeUsersPoll(); // Run immediately on mount
     demographicPoll(); // Run immediately on mount
+    serverDataPoll(); // Run immediately on mount
 
     const interval = setInterval(() => {
       networkPoll();
@@ -187,7 +222,7 @@ export function SystemMetricsPoller() {
       attemptsPoll();
       activeUsersPoll();
       demographicPoll();
-    }, 5000); // Poll every 5 second
+    }, 5000); // Poll every 5 seconds
 
     return () => {
       controller.abort();
