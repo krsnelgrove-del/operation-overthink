@@ -19,11 +19,11 @@ export default function DataTrackerCard({ title, data }: Props) {
 
   const plotData = [{
     name: "Usage",
-    uv: memoryUsage,
+    uv: memoryUsage ?? 0,
   },
 {
   name: "Max",
-  uv: memoryMax,
+  uv: memoryMax ?? 100,
 }]
 
   return (
