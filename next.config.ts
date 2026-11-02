@@ -1,12 +1,13 @@
+/** @type {import('next').NextConfig} */
 const nextConfig = {
-  async redirects() {
-    return [
+  reactStrictMode: true,
+  images: {
+    remotePatterns: [
       {
-        source: '/',
-        destination: '/home',
-        permanent: true, // Set to true if you want a permanent 308 redirect
+        protocol: 'https',
+        hostname: '**',
       },
-    ]
+    ],
   },
 };
 

@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, JetBrains_Mono, Oxanium } from "next/font/google";
 import "./globals.css";
@@ -40,3 +42,5 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     </html>
   );
 }
+
+
