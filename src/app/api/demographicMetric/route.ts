@@ -4,14 +4,16 @@ import { NextResponse } from "next/server";
 export async function GET() {
 
   try {
-    const resp = await db.orm.public.User.groupBy("countryOfOrigin").aggregate((value) => ({
-        count: value.count()
-    }))
-    console.log("RESPONSE FROM DEMOGRAPHICMETRIC ROUTE: ", resp);
+    const resp = await db.orm.public.User.groupBy("countryOfOrigin").aggregate((agg) => ({
+        count: agg.count()
+    })).then(res => res).catch((error) => {
+        console.error("Error fetching demographic metrics:", error);
+        throw error;
+    });
 
     const demographicAggregate = resp.map((itm) => ({
         origin: itm.countryOfOrigin ?? "NaN",
-        count: itm.count,
+        count: itm.count ?? 0,
     }));
 
     return NextResponse.json({

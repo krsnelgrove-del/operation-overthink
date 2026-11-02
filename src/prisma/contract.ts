@@ -1,75 +1,63 @@
-import { defineContract, enumType, member } from '@prisma/orm-postgres/contract-builder';
+import { 
+  defineContract,
+  rlsEnabled, 
+  now, 
+  policySelect, 
+  policyUpdate, 
+  policyInsert, 
+  role 
+} from '@prisma/orm-postgres/contract-builder';
 
-// 1. Explicitly satisfy the exact type contract required by your package version
-const pgText = { 
-  codecId: "pg/text@1", 
-  nativeType: "text" 
-} as const;
-
-// 2. Define the demographic country code enum type using the valid object
-export const CountryCode = enumType(
-  "CountryCode",
-  pgText, 
-  member("US", "US"),
-  member("CA", "CA"),
-  member("MX", "MX"),
-  member("GB", "GB"),
-  member("DE", "DE"),
-  member("FR", "FR"),
-  member("IT", "IT"),
-  member("ES", "ES"),
-  member("NL", "NL"),
-  member("CH", "CH"),
-  member("CN", "CN"),
-  member("JP", "JP"),
-  member("KR", "KR"),
-  member("IN", "IN"),
-  member("SG", "SG"),
-  member("SA", "SA"),
-  member("AE", "AE"),
-  member("BR", "BR"),
-  member("AR", "AR"),
-  member("AU", "AU"),
-  member("NZ", "NZ"),
-  member("ZA", "ZA"),
-  member("NaN", "NaN") 
-);
-
-export const contract = defineContract({}, ({ field, model, rel }) => {
-  const visitorCount = model('VisitorCount', {
-    fields: {
-      id: field.text().id().default('global'),
-      count: field.int().default(0),
-      createdAt: field.temporal.createdAtString(),
-      updatedAt: field.temporal.updatedAtString(),
-    },
-  });
-
-  const decryptionEfficiency = model('Attempts', {
-    fields: {
-      id: field.text().id().default('global'),
-      correctAttempts: field.int().default(0),
-      incorrectAttempts: field.int().default(0),
-      createdAt: field.temporal.createdAtString(),
-      updatedAt: field.temporal.updatedAtString(),
-    },
-  });
+export const contract = defineContract({}, ({ field, model }) => {
+  
   const user = model('User', {
     fields: {
-      id: field.text().id().default('global'),
-      countryOfOrigin: field.column(CountryCode).default("NaN"),
-      isActive: field.boolean().default(true),
+      id: field.id.uuidv4String(),
+      countryOfOrigin: field.text().default("NaN"),
+      correctAttempts: field.int().default(0),
+      incorrectAttempts: field.int().default(0),
+      isActive: field.boolean().default(false),
       role: field.text().default('USER'),
-      createdAt: field.temporal.createdAtString(),
-      updatedAt: field.temporal.updatedAtString(),
+      createdAt: field.temporal.createdAt(),
+      updatedAt: field.temporal.updatedAt(),
+      lastOnline: field.temporal.updatedAt().default(now()),
     },
   });
+
+  const dbRoles = {
+    publicRole: role("anon"),
+    authRole: role("authenticated"),
+    adminRole: role("supabase_admin"),
+  };
 
   return {
     models: {
       User: user,
-      VisitorCount: visitorCount,
-      Attempts: decryptionEfficiency,
     },
+
+    entities: [
+      rlsEnabled(user),
+      dbRoles.publicRole,
+      dbRoles.authRole,
+      dbRoles.adminRole,
+    ],
+
+    policies: [
+      policySelect(user, {
+        name: "Enable user read access for all users",
+        roles: [dbRoles.publicRole, dbRoles.adminRole, dbRoles.authRole],
+        using: "true",
+      }),
+      policyInsert(user, {
+        name: "Enable user registration for all roles",
+        roles: [dbRoles.publicRole, dbRoles.adminRole, dbRoles.authRole],
+        withCheck: "true",
+      }),
+      policyUpdate(user, {
+        name: "Enable state changes and increment actions on user schemas",
+        roles: [dbRoles.publicRole, dbRoles.adminRole, dbRoles.authRole],
+        using: "true",
+      }),
+    ]
   };
 });

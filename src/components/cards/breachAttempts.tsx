@@ -1,6 +1,7 @@
 "use client";
 
 import { ComposableMap, Geographies, Geography, Line } from "react-simple-maps";
+import { useDashboardStore } from "@/app/(utils)/useMetricsStore";
 import { ArrowUpRight } from "lucide-react";
 
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
@@ -15,41 +16,39 @@ const threatConnections: { from: Coordinate; to: Coordinate }[] = [
 ] as const;
 
 export default function BreachAttemptsCard() {
-  const breachCount = 1562;
+  const breachCount = useDashboardStore((state) => state.visitCount);
   const growthPercentage = 3;
 
   return (
-    <div className="w-full h-full bg-[#0d1520]/80 border border-[#1e2d3d] rounded-xl p-5 text-slate-200 font-sans backdrop-blur-md shadow-2xl">
+    <div className="relative flex flex-col justify-between w-full h-full p-5 rounded-2xl bg-zinc-900/40 hover:bg-zinc-900/70 border border-zinc-800/60 hover:border-zinc-700/80 transition-all duration-300 backdrop-blur-md shadow-xl text-slate-200">
       
-      {/* Upper Data Header Grid Layout */}
-      <div className="flex justify-between items-start mb-4">
-        <div>
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+      {/* Upper Data Header Layout (Title and (Non)-Real-Time Badge Inline Flexed) */}
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-semibold uppercase tracking-wider text-zinc-300">
             Breach Attempts
           </span>
-          <div className="flex items-center gap-2 mt-1">
-            <span className="text-3xl font-extrabold text-white tracking-tight">
-              {breachCount.toLocaleString()}
-            </span>
-            <span className="flex items-center gap-0.5 text-xs font-semibold text-amber-500 bg-amber-500/10 px-1.5 py-0.5 rounded">
-              <ArrowUpRight size={12} className="stroke-3" />
-              +{growthPercentage}% Hour
-            </span>
-          </div>
         </div>
-
-        <div className="text-right">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-amber-500 block">
-            Non-Real-Time Alerts
-          </span>
-        </div>
+        <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-amber-950/40 text-amber-400 border border-amber-500/30 uppercase tracking-widest">
+          (Non)-Real-Time
+        </span>
       </div>
 
-      {/* Main Map Box & HUD Interface Container */}
-      <div className="relative flex w-full h-full bg-[#070b12] border border-[#142130] rounded-lg overflow-hidden group">
+      {/* Primary Metric Value & Growth Sub-tag */}
+      <div className="flex items-center gap-2.5 mb-3">
+        <span className="text-3xl font-black text-white tracking-tight drop-shadow-[0_0_12px_rgba(245,158,11,0.3)]">
+          {breachCount}
+        </span>
+        <span className="flex items-center gap-0.5 text-[11px] font-semibold text-amber-400 bg-amber-950/60 border border-amber-500/30 px-2 py-0.5 rounded-md shadow-sm">
+          <ArrowUpRight size={12} className="stroke-[2.5]" />
+          +{growthPercentage}% Hour
+        </span>
+      </div>
+
+      {/* Main Map Box Container (h-44 height matching RadialChart) */}
+      <div className="relative flex w-full h-44 bg-zinc-950/60 border border-zinc-800/40 rounded-xl overflow-hidden group mb-3">
         
-        {/* Absolute Graphical Map Content Rendering */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-80">
+        <div className="absolute inset-0 flex items-center justify-center opacity-85">
           <ComposableMap
             projection="geoNaturalEarth1"
             projectionConfig={{
@@ -60,15 +59,14 @@ export default function BreachAttemptsCard() {
             height={200}
             className="w-full h-full"
           >
-            {/* 1. Global Geographies: Landmass Vector Graphics Layer */}
             <Geographies geography={geoUrl}>
               {({ geographies }) =>
                 geographies.map((geo) => (
                   <Geography
                     key={geo.rsmKey}
                     geography={geo}
-                    fill="#101a26"
-                    stroke="#1c2d42"
+                    fill="#18181b"
+                    stroke="#27272a"
                     strokeWidth={0.5}
                     className="w-full h-full outline-none"
                   />
@@ -76,13 +74,13 @@ export default function BreachAttemptsCard() {
               }
             </Geographies>
 
-            {/* 2. Vector Threat Lines: Connecting Attack Coordinates Across Nodes */}
+            {/* Vector Threat Lines */}
             {threatConnections.map((connection, i) => (
               <Line
                 key={i}
                 from={connection.from}
                 to={connection.to}
-                stroke="#f59e0b" // Amber / Orange visual pathing lines
+                stroke="#f59e0b"
                 strokeWidth={1.5}
                 strokeLinecap="round"
                 className="animate-pulse"
@@ -94,22 +92,37 @@ export default function BreachAttemptsCard() {
           </ComposableMap>
         </div>
 
-
         {/* Subsidiary Target Node Pin Location */}
-        <div className="absolute bottom-[65%] left-[36%] flex flex-col items-center z-10">
+        <div className="absolute bottom-[65%] left-[36%] flex flex-col items-center z-10 pointer-events-none">
           <div className="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_8px_#f59e0b] animate-pulse" />
-          <span className="text-[7px] font-mono text-amber-500/70 mt-1 uppercase">NA-EST</span>
+          <span className="text-[7px] font-mono text-amber-400/80 mt-1 uppercase tracking-widest bg-zinc-950/80 px-1 rounded border border-amber-500/20">NA-EST</span>
         </div>
 
-        {/* 4. Lower Cyber Metric Status Bar */}
+        {/* Lower Cyber Metric Status Bar */}
         <div className="absolute bottom-2 left-2 z-10">
-          <span className="inline-flex items-center gap-1.5 bg-red-950/80 border border-red-900/60 text-red-400 text-[9px] font-bold px-2 py-0.5 rounded uppercase tracking-widest shadow-md">
-            <span className="w-1 h-1 rounded-full bg-red-500 animate-ping" />
-            Critical
+          <span className="inline-flex items-center gap-1.5 bg-red-950/80 border border-red-500/30 text-red-400 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider shadow-md backdrop-blur-md">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+            </span>
+            Critical Alert
           </span>
         </div>
 
       </div>
+
+      {/* Symmetrical Telemetry Footer */}
+      <div className="grid grid-cols-2 gap-2 pt-2 border-t border-zinc-800/60 text-[11px]">
+        <div className="bg-zinc-950/40 border border-zinc-800/60 rounded-lg px-3 py-1.5 flex flex-col">
+          <span className="text-[10px] font-mono text-zinc-500 uppercase">Primary Zone</span>
+          <span className="font-mono font-semibold text-amber-400 mt-0.5">NA-EST Node</span>
+        </div>
+        <div className="bg-zinc-950/40 border border-zinc-800/60 rounded-lg px-3 py-1.5 flex flex-col text-right">
+          <span className="text-[10px] font-mono text-zinc-500 uppercase">Active Vectors</span>
+          <span className="font-mono font-semibold text-zinc-200 mt-0.5">4 Nodes Linked</span>
+        </div>
+      </div>
+
     </div>
   );
 }

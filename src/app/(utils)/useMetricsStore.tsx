@@ -16,7 +16,17 @@ interface UseMetricsStore {
   demographic: CountryOfOrigin[] | null,
   serverLatency: number | null,
   serverCountry: string,
-  activeUsers: number | null,
+  activeUsers: {
+          id: string,
+          countryOfOrigin: string,
+          correctAttempts: number,
+          incorrectAttempts: number,
+          isActive: boolean,
+          role: string,
+          createdAt: Date,
+          updatedAt: Date,
+          lastOnline: Date,
+  }[] | null,
   
   batchUpdate: (updates: Partial<Omit<UseMetricsStore, "setMetric" | "batchUpdate">>) => void;
 }

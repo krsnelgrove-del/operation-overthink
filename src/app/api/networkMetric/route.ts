@@ -7,7 +7,7 @@ export async function GET() {
   try {
     const start = performance.now();
 
-    await db.orm.public.VisitorCount.first();
+    await db.orm.public.User.first();
 
     const dbLatency = Math.round(performance.now() - start);
 
@@ -20,7 +20,7 @@ export async function GET() {
       }
     );
   } catch (error) {
-    console.error("Error updating network metrics:", error);
+    console.warn("Error updating network metrics:", error);
     return NextResponse.json(
       { latency: 15, error: "Failed to fetch network metrics" },
       { status: 500 }

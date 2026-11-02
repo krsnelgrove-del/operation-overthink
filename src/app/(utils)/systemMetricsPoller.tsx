@@ -20,14 +20,15 @@ export function SystemMetricsPoller() {
     const networkPoll = async () => {
       try {
         const response = await fetch("/api/networkMetric", {
+          method: "GET",
           signal: controller.signal,
           cache: "no-store",
         });
 
         if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`HTTP error 500 thrown:  ${response.status}: ${errorText}`);
-}
+          console.warn(`HTTP error 500 thrown:  ${response.status}: ${await response.text()}`);
+          return;
+        }
 
         const data = await response.json();
 
@@ -36,38 +37,58 @@ export function SystemMetricsPoller() {
           serverLatency: data.latency,
         });
       } catch (err: any) {
-        if (err.name !== "AbortError") {
+        if (err) {
           console.error("Network metrics polling failed:", err);
         }
       }
     };
 
     const visitorPoll = async () => {
-      try {
-        const hasVisited = localStorage.getItem("has_visited_site");
-        if (!hasVisited) {
 
-          fetch("/api/visitorCount", { method: "POST", cache: "no-store" })
-          .then((res) => res.json())
-          .then((data) => {
-            batchUpdate({ visitCount: data.visitCount });
-          }).catch((err) => console.error("Failed to increment unique visit:", err));
-          
-          localStorage.setItem("has_visited_site", "true");
-        }
-        else {
-          fetch("/api/visitorCount", { method: "GET", cache: "no-store" })
-          .then((res) => res.json())
-          .then((data) => {
-            batchUpdate({ visitCount: data.visitCount });
-          }).catch((err) => console.error("Failed to increment unique visit:", err));
-        }
+        //register as new user if user does not exist in db. return the total visitor count from db and update the state. 
+        // set a localstorage item to prevent multiple increments from the same user.
+        // if the user has already visited, just fetch the total visitor count from db and update the state.
+        
+      try {
+      const hasVisited = localStorage.getItem("has_visited_site");
+
+      if(!hasVisited) {
+        const response = await fetch("/api/users", {
+          method: "POST",
+          body: JSON.stringify({ visitorId: crypto.randomUUID() }),
+          signal: controller.signal,
+          cache: "no-store",
+        });
+
+      if (!response.ok) {
+        console.warn(`HTTP error! Status: ${response.status}`);
+        return;
       }
-    catch (err: any) {
-        if (err.name !== "AbortError") {
-          console.error("Visitorp metrics polling failed:", err);
-        }
-      }}
+
+      localStorage.setItem("has_visited_site", "true");
+      
+      const data = await response.json();
+
+      batchUpdate({ visitCount: data.userCount });
+    }
+    else {
+      
+      const response = await fetch("/api/users?returnType=userCount", {
+        method: "GET",
+        signal: controller.signal,
+        cache: "no-store",
+      });
+  
+      const data = await response.json();
+      batchUpdate({ visitCount: data.visitCount });
+    }
+  } catch (err: any) {
+    if (err.name !== "AbortError") {
+      console.warn("Visitor metrics polling failed:", err);
+      return;
+    }
+  }
+};
 
     const memoryPoll = async () => {
       try {
@@ -92,7 +113,8 @@ export function SystemMetricsPoller() {
 
       } catch (err: any) {
         if (err.name !== "AbortError") {
-          console.error("Metrics polling failed:", err);
+          console.warn("Metrics polling failed:", err);
+          return;
         }
       }
     };
@@ -120,17 +142,19 @@ export function SystemMetricsPoller() {
 
       } catch (err: any) {
         if (err.name !== "AbortError") {
-          console.error("Attempts metric polling failed:", err);
+          console.warn("Attempts metric polling failed:", err);
+          return;
         }
       }
     };
 
     const activeUsersPoll = async () => {
       try {
-        const response = await fetch("/api/activeUsers", {
+        const response = await fetch("/api/users?returnType=getActiveUsers", {
           signal: controller.signal,
           cache: "no-store",
         });
+        
 
         if (!response.ok) {
           const errorText = await response.text();
@@ -140,14 +164,13 @@ export function SystemMetricsPoller() {
         const data = await response.json();
 
         batchUpdate({
-          activeUsers: data.activeUsers,
+          activeUsers: data.usersOnline,
         });
-
-        console.log("Attempts metrics updated:", data); // Debugging line
 
       } catch (err: any) {
         if (err.name !== "AbortError") {
-          console.error("Active Users metric polling failed:", err);
+          console.warn("Active Users metric polling failed:", err);
+          return;
         }
       }
     };
@@ -161,7 +184,8 @@ export function SystemMetricsPoller() {
 
       if(!response.ok) {
         const errorText = await response.text();
-        throw new Error(`HTTP error 500 thrown: ${response.status}: ${errorText}`);
+        console.warn(`HTTP error 500 thrown: ${response.status}: ${errorText}`);
+        return;
       }
 
       const data = await response.json();
@@ -197,21 +221,21 @@ export function SystemMetricsPoller() {
 
       } catch (err: any) {
         if (err.name !== "AbortError") {
-          console.error("Server data metric polling failed:", err);
+          console.warn("Server data metric polling failed:", err);
+          return;
         }
       }
 
     }
-
-    const hasVisited = localStorage.getItem("has_visited");
   
+    memoryPoll(); // Run immediately on mount
+    serverDataPoll(); // Run immediately on mount
     networkPoll(); // Run immediately on mount
     visitorPoll(); // Run immediately on mount
-    memoryPoll(); // Run immediately on mount
-    attemptsPoll(); // Run immediately on mount
     activeUsersPoll(); // Run immediately on mount
+    attemptsPoll(); // Run immediately on mount
     demographicPoll(); // Run immediately on mount
-    serverDataPoll(); // Run immediately on mount
+
 
     const interval = setInterval(() => {
       networkPoll();
