@@ -11,7 +11,7 @@ export default definePrismaConfig({
     output: "./src/prisma",
     
     db: { 
-      connection: process.env.DATABASE_URL!,
+      connection: process.env.DATABASE_URL,
     },
   }),
 });
