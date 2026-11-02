@@ -5,7 +5,8 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme default{
-  --background-image-hero-pattern: linear-gradient(rgba(5, 5, 50, 0.7), rgba(20, 5, 5, 1)), url('/background1.jpg');
+  --background-image-hero-pattern: linear-gradient(rgba(8, 13, 20, 0.3), rgba(8, 13, 20, 1)), url('/background1.jpg');
+  --background-image-dashboard-pattern: url('/dashboard-bg.jpeg');
   --animate-fade-out: fade-out 5s ease-in-out forwards;
   --animate-fade-in: fade-in 5s ease-in-out forwards;
   --animate-blink: blink 1s steps(1, start) infinite;

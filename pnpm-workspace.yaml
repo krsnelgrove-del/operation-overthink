@@ -1,0 +1,18 @@
+allowBuilds:
+  esbuild: false
+  msgpackr-extract: true
+  workerd: false
+
+
+overrides:
+  "prisma": "8.0.0-rc.13"
+  "@prisma/orm-framework": "8.0.0-rc.13"
+  "@prisma/orm-toolchain": "8.0.0-rc.13"
+  "@prisma/cli-engine": "0.6.1"
+  "@prisma/orm-postgres": "8.0.0-rc.13"
+  "@prisma/orm-extension-supabase": "8.0.0-rc.13"
+
+peerDependencyRules:
+  allowedVersions:
+    typescript: "7.x"
+    react: "19.x"
