@@ -61,13 +61,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Missing visitor ID" }, { status: 401 });
     }
 
-    const nowIso = Temporal.Now.plainDateTimeISO("America/New_York").toString();
+    const nowIso = Temporal.Now.instant();
 
     await db.orm.public.User.where((u) => u.id.eq(visitorId)).upsert({
       create: {
         id: visitorId,
-        createdAt: nowIso,
-        updatedAt: nowIso,
+        createdAt: nowIso as any,
+        updatedAt: nowIso as any,
+        lastOnline: nowIso as any,
         countryOfOrigin: "NaN",
         correctAttempts: 0,
         incorrectAttempts: 0,
@@ -75,7 +76,8 @@ export async function POST(request: Request) {
         role: "USER",
       },
       update: {
-        updatedAt: nowIso,
+        updatedAt: nowIso as any,
+        lastOnline: nowIso as any,
         isActive: true,
       }
     });
