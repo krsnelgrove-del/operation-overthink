@@ -132,7 +132,7 @@ const currentLockedState = SECRET_COMBO_ARRAY.map((digit, i) => {
    
 
 
-// Updating the ref after every render :)
+// Updating ref after every render 
 useEffect(() => {
   inputRef.current?.focus();
 

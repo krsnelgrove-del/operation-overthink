@@ -19,7 +19,8 @@ export default function Dashboard() {
     
     return (
         <div className="w-full h-full grid grid-rows-12 grid-cols-12 gap-0 z-10 overflow-hidden">
-            <div className="absolute w-full h-full bg-dashboard-pattern mask-b-from-2.5 -z-5 bg-cover bg-fixed scale-x-[-1] scale-y-[-1] scale-500"></div>
+            <div className="absolute w-full h-full bg-dashboard-pattern mask-b-from-2.5 -z-5 bg-cover bg-fixed scale-x-[-1] scale-y-[-1] scale-500
+            animate-[pulse_6s_ease-in-out_infinite]"></div>
             
             <Header serverCountry={serverCountry}/>
             <NavigationBar pathName={pathName}/>

@@ -13,7 +13,7 @@ export default function Header({ serverCountry }: Props) {
       {/* Brand / Logo Section */}
       <div className="flex items-center justify-center gap-2 col-span-2 border-r border-white/20 pr-4 text-white font-bold tracking-wider">
         <Cpu size={28} className="text-cyan-400 drop-shadow-[0_0_12px_rgba(6,182,212,0.5)] shrink-0" />
-        <span className="text-xl font-black tracking-wider text-white">NEXUS</span>
+        <span className="text-xl font-black tracking-wider text-white">OVERTHINK!</span>
       </div>
 
       {/* Title / Description */}

@@ -1,94 +1,137 @@
-# Operation-Overthink — Engineering Portfolio README
+# Operation-Overthink — System Telemetry & Analytics Dashboard
 
-## 1. Project Overview
+A high-performance, real-time system telemetry and analytics web application engineered with Next.js (App Router), TypeScript, Prisma ORM, and PostgreSQL. The application provides continuous observation of visitor interactions, active session lifecycles, real-time server latency, memory utilization gauges, breach attempt tracking via interactive vector maps, and geographical user demographic aggregation through asynchronous client-server polling.
 
-**Operation-Overthink** is a full-stack, real-time analytics and telemetry dashboard built with Next.js App Router, React, TypeScript, and PostgreSQL. 
+## 1. Comprehensive Architecture & File Inventory
 
-The project explores the engineering challenges of building high-frequency client-server telemetry systems. It implements a reactive dashboard that tracks visitor activity, system resource utilization, user demographics, and application interaction metrics through dynamic polling and state orchestration. Designed as both a performance playground and a diagnostic interface, Codecrackproject demonstrates production-aligned patterns for data aggregation, asynchronous state management, and real-time visualization.
+The repository follows a clean, decoupled client-server architecture separating database contracts, API route handlers, state management stores, and modular UI components.
 
----
+### Route Handlers (`src/app/api/`)
 
-## 2. Key Features
+* **`src/app/api/activeUsers/route.ts`** — Queries the active session table via Prisma to return connected user profiles, roles, and online timestamps.
 
-* **Real-Time Telemetry Dashboard:** A responsive analytics suite featuring live metric visualization powered by Recharts, providing instant feedback on system state and user engagement.
-* **Granular Polling Architecture:** Multi-tier client polling separating high-frequency resource metrics (every 1 second) from lower-frequency aggregate metrics (every 5 seconds) to optimize throughput.
-* **Visitor Tracking & Lifecycle Management:** Automated visitor registration, session tracking, and active-user state management via dedicated API route handlers.
-* **Demographic Aggregation:** Server-side grouping and real-time calculation of user distribution by country of origin.
-* **Interactive Visualizations & Graphics:** Integrated UI motion effects, WebGL graphics rendering via OGL, and clean iconography for an immersive user experience.
+* **`src/app/api/attempts/route.ts`** — Aggregates breach attempts and threat vector occurrences.
 
----
+* **`src/app/api/demographic/route.ts`** — Computes server-side groupings of user distribution mapped by country of origin.
 
-## 3. Technology Stack
+* **`src/app/api/memory/route.ts`** — Exposes system memory capacity and real-time usage metrics.
 
-* **Framework:** Next.js 16 (App Router)
-* **UI Library:** React 19, Tailwind CSS 4
-* **Language:** TypeScript
+* **`src/app/api/network/route.ts`** — Calculates network telemetry and ping diagnostics.
+
+* **`src/app/api/visitorCount/route.ts`** — Manages visitor activity telemetry and session registration counters.
+
+### Client Utilities & State Store (`src/app/(utils)/`)
+
+* **`src/app/(utils)/useMetricsStore.ts`** — Centralized Zustand state store managing global telemetry state across all dashboard widgets without triggering cascading React re-renders.
+
+* **`src/app/(utils)/systemMetricsPoller.tsx`** — Background polling orchestrator maintaining multi-tier asynchronous cadences (1000ms for high-frequency resource probes, 5000ms for aggregate demographic polling).
+
+### Core Layout & Navigation Components (`src/app/dashboard/` & `src/components/`)
+
+* **`src/app/dashboard/page.tsx`** — Main dashboard container orchestrating the 12-column grid layout and child panels.
+
+* **`src/app/dashboard/(config)/dashboardCards.tsx`** — Configuration mapping registry pairing UI component references with initial data props and grid spans.
+
+* **`src/components/header.tsx`** — Top-level navigation container featuring brand identification, real-time system status indicators, server info integration, and session termination routing.
+
+* **`src/components/navigationBar.tsx`** — Vertical sidebar navigation providing route switching between Overview, Analytics, and Logs utilizing `lucide-react` iconography.
+
+* **`src/components/header-elements/serverInfo.tsx`** — Node metadata display rendering active server region configuration.
+
+* **`src/components/latencyBadge.tsx`** — Dynamic connection status badge reflecting real-time ping thresholds.
+
+* **`src/components/latencyGraph.tsx`** — Time-series latency visualizer.
+
+* **`src/components/ui/listItem.tsx`** — Reusable list item primitive for active session rows.
+
+### Standardized Dashboard Cards (`src/components/cards/`)
+
+* **`activeSessions.tsx`** — Scrollable active user list featuring custom CSS fade-out masks (`[mask-image:linear-gradient(to_bottom,black_80%,transparent_100%)]`) and live session count badges.
+
+* **`breachAttemptsCard.tsx`** — Vector map container utilizing `react-simple-maps` to plot geo-coordinate threat lines between global attack nodes.
+
+* **`demographicMap.tsx`** — Regional distribution table calculating percentage shares and aggregating origin counts.
+
+* **`radialChart.tsx`** — Recharts-powered radial capacity gauge featuring dynamic gradient fills, SVG drop-shadow filters, and threshold alerts.
+
+* **`serverLatencyCard.tsx`** — Real-time latency monitor integrating `LatencyBadge` and `LatencyGraph`.
+
+### Database & Infrastructure (`prisma/`)
+
+* **`prisma/schema.prisma`** — Primary data contract defining models for visitors, sessions, demographics, and metrics.
+
+* **`prisma/seed.ts`** — Database initialization script seeding initial mock telemetry states.
+
+## 2. Technology Stack
+
+* **Framework & Core:** Next.js 16 (App Router), React 19, TypeScript
+
 * **State Management:** Zustand
-* **Data Visualization:** Recharts
-* **Graphics & Animation:** Motion, OGL
-* **Database & ORM:** PostgreSQL, Prisma
 
----
+* **Styling & Design System:** Tailwind CSS v4, Lucide React
 
-## 4. Architecture & Data Flow
+* **Data Visualization & GIS:** Recharts, `react-simple-maps`, `world-atlas`
 
-Operation-Overthink adopts a decoupled client-server pattern where browser-side polling hooks query Next.js Route Handlers, updating a centralized global state store that drives the UI.
+* **Database & ORM:** PostgreSQL (Supabase), Prisma v8 ORM
 
-```text
-Home page / visitor activity
-            |
-            v
-      API route handlers (src/app/api/)
-            |
-            v
-      PostgreSQL database
-            |
-            v
-    Metrics polling component (systemMetricsPoller.tsx)
-            |
-            v
-       Zustand Store (useMetricsStore.tsx)
-            |
-            v
-      Dashboard UI & Recharts Visualizations
-```
+* **Runtime Utilities:** Temporal API polyfills, SVG Drop-Shadow filter effects
 
-### Core Structural Layout
-- **`src/app/api/`** — Server-side route handlers managing isolated data domains (active users, attempts, demographics, memory, network, visitor counts).
-- **`src/app/(utils)/`** — Client orchestration layer containing the Zustand store and background polling logic.
-- **`src/prisma/`** — Data contract definitions, connection initializers, and development seeding scripts.
+## 3. Engineering Challenges & Technical Pain Points
 
----
+Building a real-time, multi-tier telemetry interface required resolving complex architectural hurdles during development:
 
-## 5. Key Engineering Decisions
+### 1. Vector Map Coordinate Projection Alignment
 
-* **Zustand for Client State:** Chosen for its lightweight footprint and minimal boilerplate compared to Redux or React Context, allowing high-frequency metric updates to propagate directly to dashboard components without triggering unnecessary React tree re-renders.
-* **Asynchronous Tiered Polling:** Separating high-cadence probes (memory/network metrics at 1s intervals) from low-cadence aggregation queries (demographics/active users at 5s intervals) prevents thread starvation and database connection saturation.
-* **Next.js App Router & Route Handlers:** Leveraged native backend routing to co-locate API endpoints cleanly within the application structure, streamlining data contracts between the database and client components.
+* **The Challenge:** Integrating `react-simple-maps` with custom threat vector lines (`[longitude, latitude]` coordinate pairs) presented significant spatial projection difficulties. Initial implementations suffered from coordinate translation misalignment, causing threat arcs to render detached from geographic landmass nodes during responsive scaling.
 
----
+* **The Resolution:** Configured an explicit `geoNaturalEarth1` projection scale with fixed center points (`[-50, 20]`) and standardized dimensions (`width={400}, height={200}`), wrapping the map in an absolute-positioned container with SVG line stroke dasharrays to maintain stable spatial anchoring across breakpoints.
 
-## 6. Challenges and Improvements
+### 2. Database Schema Drift & Type Contract Discrepancies
 
-During development and code review, several architectural constraints and edge cases were identified and addressed:
+* **The Challenge:** During iterative backend development integrating with a live Supabase PostgreSQL instance, the project experienced severe database schema drift. TypeScript contract interfaces diverged from the actual live database schema state, resulting in silent serialization failures and runtime query exceptions during aggregate data mapping.
 
-* **HTTP Method Semantic Leak:** The original implementation of `GET /api/visitorCount` introduced a write side-effect by incrementing the counter on every read request. *Improvement:* Noted for refactoring to strict CQRS principles (separating read queries from write mutations).
-* **Network Metric Precision:** The `networkMetric` endpoint originally measured database query execution duration rather than true end-to-end network latency. *Improvement:* Documented explicitly to prevent metric misinterpretation and guide future client-ping implementation.
-* **Credential Hygiene:** Identified and remediated hardcoded database configuration credentials by migrating fully to environment-variable-driven connection strings.
+* **The Resolution:** Conducted a rigorous schema reconciliation audit. Synchronized the Prisma client definitions with Supabase DDL migrations, enforced strict typing on database response payloads, and resolved type mismatch discrepancies between client-side store models and server route responses.
 
----
+### 3. Runtime Temporal API Instantiation Errors
 
-## 7. Demo and Screenshots
+* **The Challenge:** Server-side route handlers utilizing modern date-time operations triggered `500` execution errors in Node.js/Edge runtime environments due to native API availability gaps.
 
-*(Include screenshots of the active dashboard, real-time Recharts visualizations, and a link to a recorded video demo or live deployment here.)*
+* **The Resolution:** Injected robust `Temporal` polyfill definitions directly into `globalThis` during application bootstrap, ensuring consistent execution across server route handlers and client hooks.
 
----
+## 4. Future Roadmap & Planned Implementations
 
-## 8. My Contributions and Next Steps
+* **Overview View Integration:** Implement dedicated top-level system summaries and aggregate operational health metrics under the `../overview` route.
+* **System Logs Subsystem:** Build out the `../logs` route and interface handler to stream real-time diagnostic audit trails and database event logs.
+* **WebSocket / SSE Streaming:** Migrate client-polling architectures to persistent WebSockets or Server-Sent Events to optimize high-frequency data throughput.
+* **Automated Integration Testing:** Introduce comprehensive end-to-end tests for telemetry API route handlers and store state synchronization.
 
-* **Contributions:** Designed and built the complete full-stack architecture from database schema definition (Prisma/PostgreSQL) to API route creation, custom polling hooks, Zustand state integration, and the reactive Recharts dashboard interface.
-* **Known Limitations:** Polling-based updates scale effectively for moderate loads but face connection overhead at high user volumes; migration to WebSockets or Server-Sent Events (SSE) is a planned architectural upgrade.
-* **Next Steps:** 
-  1. Refactor query endpoints to eliminate read-side mutations.
-  2. Implement comprehensive automated integration testing for telemetry endpoints.
-  3. Explore WebSockets for sub-second streaming metrics !*******!
+## 5. Setup & Local Development
+
+1. **Clone the Repository:**
+
+   ```bash
+   git clone -b Dashboard-Implementation https://github.com/krsnelgrove-del/operation-overthink.git
+   cd operation-overthink
+   ```
+
+2. **Install Dependencies:**
+
+   ```bash
+   npm install
+   ```
+
+3. **Configure Environment Variables:**
+   Create a `.env` file in the root directory:
+
+   ```bash
+   DATABASE_URL="postgresql://postgres:[PASSWORD]@[HOST]:5432/postgres?schema=public"
+   ```
+
+4. **Initialize Database & Run Development Server:**
+
+   ```bash
+   npx prisma db push
+   npm run dev
+   ```
+
+5. Access `http://localhost:3000` to interact with the telemetry dashboard.
