@@ -141,13 +141,11 @@ useEffect(() => {
 
   return (
     <div className={cn("flex flex-col overflow-hidden w-full h-auto gap-4 sm:gap-4 bg-linear-to-t from-white/0 to-black/50 border-t-2 border-l-2 border-r-2 border-white/30 rounded-4xl shadow-2xl mx-auto", className)}>
-            {/* Card text */}
       <div className="p-4 sm:p-8 mb-auto">
        {titleValue}
         <br />
         {bodyValue}
       </div>
-            {/* Lock combination*/}
       <div className="flex justify-center w-full max-w-full min-w-0 px-4 sm:px-16">
         <InputOTP 
           maxLength={SECRET_COMBO_ARRAY.length} 

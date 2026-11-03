@@ -20,9 +20,8 @@ export default function BreachAttemptsCard() {
   const growthPercentage = 3;
 
   return (
-    <div className="relative flex flex-col justify-between w-full h-full p-5 rounded-2xl bg-zinc-900/40 hover:bg-zinc-900/70 border border-zinc-800/60 hover:border-zinc-700/80 transition-all duration-300 backdrop-blur-md shadow-xl text-slate-200">
+    <div className="relative flex flex-col justify-between w-full h-full p-5 rounded-2xl bg-[#0d1520]/20 border border-zinc-800/60 backdrop-blur-md shadow-xl text-slate-200">
       
-      {/* Upper Data Header Layout (Title and (Non)-Real-Time Badge Inline Flexed) */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <span className="text-xs font-semibold uppercase tracking-wider text-zinc-300">
@@ -34,7 +33,6 @@ export default function BreachAttemptsCard() {
         </span>
       </div>
 
-      {/* Primary Metric Value & Growth Sub-tag */}
       <div className="flex items-center gap-2.5 mb-3">
         <span className="text-3xl font-black text-white tracking-tight drop-shadow-[0_0_12px_rgba(245,158,11,0.3)]">
           {breachCount}
@@ -45,7 +43,6 @@ export default function BreachAttemptsCard() {
         </span>
       </div>
 
-      {/* Main Map Box Container (h-44 height matching RadialChart) */}
       <div className="relative flex w-full h-44 bg-zinc-950/60 border border-zinc-800/40 rounded-xl overflow-hidden group mb-3">
         
         <div className="absolute inset-0 flex items-center justify-center opacity-85">
@@ -74,7 +71,6 @@ export default function BreachAttemptsCard() {
               }
             </Geographies>
 
-            {/* Vector Threat Lines */}
             {threatConnections.map((connection, i) => (
               <Line
                 key={i}
@@ -92,13 +88,11 @@ export default function BreachAttemptsCard() {
           </ComposableMap>
         </div>
 
-        {/* Subsidiary Target Node Pin Location */}
         <div className="absolute bottom-[65%] left-[36%] flex flex-col items-center z-10 pointer-events-none">
           <div className="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_8px_#f59e0b] animate-pulse" />
           <span className="text-[7px] font-mono text-amber-400/80 mt-1 uppercase tracking-widest bg-zinc-950/80 px-1 rounded border border-amber-500/20">NA-EST</span>
         </div>
 
-        {/* Lower Cyber Metric Status Bar */}
         <div className="absolute bottom-2 left-2 z-10">
           <span className="inline-flex items-center gap-1.5 bg-red-950/80 border border-red-500/30 text-red-400 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider shadow-md backdrop-blur-md">
             <span className="relative flex h-2 w-2">
@@ -111,7 +105,6 @@ export default function BreachAttemptsCard() {
 
       </div>
 
-      {/* Symmetrical Telemetry Footer */}
       <div className="grid grid-cols-2 gap-2 pt-2 border-t border-zinc-800/60 text-[11px]">
         <div className="bg-zinc-950/40 border border-zinc-800/60 rounded-lg px-3 py-1.5 flex flex-col">
           <span className="text-[10px] font-mono text-zinc-500 uppercase">Primary Zone</span>

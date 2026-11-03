@@ -5,6 +5,7 @@ export interface CountryOfOrigin {
   count: number,
 }
 interface UseMetricsStore {
+  visitorId: string | null;
   latency: number | null;
   visitCount: number | null;
   decryptionEfficiency: number | null;
@@ -32,6 +33,7 @@ interface UseMetricsStore {
 }
 
 export const useDashboardStore = create<UseMetricsStore>((set) => ({
+  visitorId: "",
   latency: null,
   visitCount: null,
   decryptionEfficiency: null,

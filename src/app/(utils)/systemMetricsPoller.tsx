@@ -5,6 +5,8 @@ import { useDashboardStore } from "./useMetricsStore";
 import { useEffect, useState } from "react";
 
 export function SystemMetricsPoller() {
+if (document.hidden) return;
+
   const [mounted, setMounted] = useState(false);
   const batchUpdate = useDashboardStore((state) => state.batchUpdate);
 
@@ -44,51 +46,52 @@ export function SystemMetricsPoller() {
     };
 
     const visitorPoll = async () => {
-
-        //register as new user if user does not exist in db. return the total visitor count from db and update the state. 
-        // set a localstorage item to prevent multiple increments from the same user.
-        // if the user has already visited, just fetch the total visitor count from db and update the state.
-        
       try {
-      const hasVisited = localStorage.getItem("has_visited_site");
+        let visitorId = localStorage.getItem("visitorId");
+        const hasVisited = localStorage.getItem("has_visited_site");
 
-      if(!hasVisited) {
-        const response = await fetch("/api/users", {
-          method: "POST",
-          body: JSON.stringify({ visitorId: crypto.randomUUID() }),
-          signal: controller.signal,
-          cache: "no-store",
-        });
+        // If no ID exists anywhere, generate one once
+        if (!visitorId) {
+          visitorId = crypto.randomUUID();
+          localStorage.setItem("visitorId", visitorId);
+        }
 
-      if (!response.ok) {
-        console.warn(`HTTP error! Status: ${response.status}`);
-        return;
-      }
+        // Sync it into the dashboard store so other components know it
+        useDashboardStore.getState().batchUpdate({ visitorId });
 
-      localStorage.setItem("has_visited_site", "true");
-      
-      const data = await response.json();
+        if (!hasVisited) {
+          const response = await fetch("/api/users", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ visitorId }),
+            signal: controller.signal,
+            cache: "no-store",
+          });
 
-      batchUpdate({ visitCount: data.userCount });
-    }
-    else {
-      
-      const response = await fetch("/api/users?returnType=userCount", {
-        method: "GET",
-        signal: controller.signal,
-        cache: "no-store",
-      });
+          if (!response.ok) {
+            console.warn(`HTTP error! Status: ${response.status}`);
+            return;
+          }
+
+          localStorage.setItem("has_visited_site", "true");
+          const data = await response.json();
+          batchUpdate({ visitCount: data.userCount });
+        } else {
+          const response = await fetch("/api/users?returnType=userCount", {
+            method: "GET",
+            signal: controller.signal,
+            cache: "no-store",
+          });
   
-      const data = await response.json();
-      batchUpdate({ visitCount: data.visitCount });
-    }
-  } catch (err: any) {
-    if (err.name !== "AbortError") {
-      console.warn("Visitor metrics polling failed:", err);
-      return;
-    }
-  }
-};
+          const data = await response.json();
+          batchUpdate({ visitCount: data.visitCount });
+        }
+      } catch (err: any) {
+        if (err.name !== "AbortError") {
+          console.warn("Visitor metrics polling failed:", err);
+        }
+      }
+    };
 
     const memoryPoll = async () => {
       try {

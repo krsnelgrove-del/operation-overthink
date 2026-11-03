@@ -7,7 +7,6 @@ import {
 } from "@/components/ui/alert"
 import React from "react";
 import { cn } from "@/lib/utils"; 
-import { forbidden } from "next/navigation";
 
 interface AlertCardProps {
   _animationKey: number;

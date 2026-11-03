@@ -1,6 +1,5 @@
 "use client"
 
-import React from 'react';
 import { LatencyBadge } from "@/components/latencyBadge";
 import LatencyGraph from '../latencyGraph';
 import { useDashboardStore } from '@/app/(utils)/useMetricsStore';
@@ -15,12 +14,11 @@ interface Props {
 
 export default function ServerLatencyCard({ title = "Server Latency", data }: Props) {
   const serverLatency = useDashboardStore((state) => state.serverLatency) ?? 0;
-  const isOptimal = serverLatency < 120; // Example threshold for status badge
+  const isOptimal = serverLatency < 120; 
 
   return (
-    <div className="relative flex flex-col justify-between w-full h-full p-5 rounded-2xl bg-zinc-900/40 hover:bg-zinc-900/70 border border-zinc-800/60 hover:border-zinc-700/80 transition-all duration-300 backdrop-blur-md shadow-xl text-slate-200">
+    <div className="relative flex flex-col justify-between w-full h-full p-5 rounded-2xl bg-[#0d1520]/20 border-zinc-800/60 backdrop-blur-md shadow-xl text-slate-200">
       
-      {/* Upper Data Header Layout (Title and Live Badge Inline Flexed) */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <span className="text-xs font-semibold uppercase tracking-wider text-zinc-300">
@@ -32,16 +30,13 @@ export default function ServerLatencyCard({ title = "Server Latency", data }: Pr
         </span>
       </div>
 
-      {/* Primary Metric Value / Latency Badge */}
       <div className="flex items-center gap-2.5 mb-3">
         <LatencyBadge ping={serverLatency} />
       </div>
 
-      {/* Main Graph Box Container (h-44 height matching other cards) */}
       <div className="relative flex w-full h-44 bg-zinc-950/60 border border-zinc-800/40 rounded-xl overflow-hidden group mb-3 p-2 items-center justify-center">
         <LatencyGraph ping={serverLatency} />
 
-        {/* Lower Cyber Metric Status Bar */}
         <div className="absolute bottom-2 left-2 z-10 pointer-events-none">
           <span className={`inline-flex items-center gap-1.5 border text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider shadow-md backdrop-blur-md ${
             isOptimal 

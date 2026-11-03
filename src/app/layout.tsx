@@ -6,6 +6,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 
 import { SystemMetricsPoller } from "./(utils)/systemMetricsPoller";
+import { GlobalPresenceProvider } from "@/components/clientPresenceTracker";
 
 const oxaniumHeading = Oxanium({subsets:['latin'],variable:'--font-heading'});
 
@@ -37,7 +38,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex w-full h-full items-center justify-center bg-black">
         <SystemMetricsPoller />
-          {children}
+              <GlobalPresenceProvider>
+                  {children}
+              </GlobalPresenceProvider>
       </body>
     </html>
   );

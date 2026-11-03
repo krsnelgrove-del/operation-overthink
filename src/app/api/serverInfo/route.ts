@@ -1,12 +1,9 @@
-// src/app/api/serverInfo/route.ts
 import { NextResponse } from "next/server";
 
-// 💡 Create a global memory cache variable outside the request handler
 let cachedServerCountry: string | null = null;
 
 export async function GET() {
   try {
-    // 1. If we already looked up the country before, return it instantly!
     if (cachedServerCountry) {
       return NextResponse.json({ 
         country: cachedServerCountry 
