@@ -18,9 +18,9 @@ export const contract = defineContract({}, ({ field, model }) => {
       incorrectAttempts: field.int().default(0),
       isActive: field.boolean().default(false),
       role: field.text().default('USER'),
-      createdAt: field.dateTime().default(now()),
-      updatedAt: field.dateTime().default(now()),
-      lastOnline: field.dateTime().default(now()),
+      createdAt: field.text().default(now()),
+      updatedAt: field.text().default(now()),
+      lastOnline: field.text().default(now()),
     },
   });
 

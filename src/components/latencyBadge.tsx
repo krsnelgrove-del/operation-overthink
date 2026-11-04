@@ -1,6 +1,3 @@
-import React from "react";
-import { useDashboardStore } from "@/app/(utils)/useMetricsStore";
-
 
 export function LatencyBadge({ ping }: { ping: number | null }) {
 

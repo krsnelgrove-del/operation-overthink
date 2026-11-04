@@ -5,14 +5,11 @@ export async function GET() {
     bytes ? `${(bytes / 1024 / 1024).toFixed(2)}` : 0;
 
   try {
-    // Get native Node.js server memory usage metrics
     const mem = process.memoryUsage();
 
     return NextResponse.json(
       {
-        // heapUsed represents the memory actually being used by V8/JavaScript elements
         usage: formatMB(mem.heapUsed),
-        // rss (Resident Set Size) represents total memory allocated to the whole process
         max: formatMB(mem.rss),
       },
       {

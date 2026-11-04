@@ -1,24 +1,16 @@
 import { db } from "@/prisma/db";
 import { NextResponse } from "next/server";
 
-
 export async function GET() {
   try {
-    const visitorMetric = await db.orm.public.User
-    .aggregate((agg) => ({ total: agg.count() }))
-    .then(res => res.total);
+    const users = await db.orm.public.User.all(); // Or your ORM's equivalent to fetch all records (e.g., .findMany() or .where(() => true))
+    
+    const userList = Array.isArray(users) ? users : [];
 
-    const correctTotal = await db.orm.public.User
-  .where((u) => u.correctAttempts.eq(0))
-  .aggregate((agg) => ({ total: agg.count() }))
-  .then(res => res.total);
+    const visitorMetric = userList.length;
 
-    const incorrectTotal = await db.orm.public.User
-  .where((u) => u.incorrectAttempts.eq(0))
-  .aggregate((agg) => ({
-    total: agg.count(),
-  }))
-  .then(res => res.total);
+    const correctTotal = userList.reduce((sum, user) => sum + (Number(user.correctAttempts) || 0), 0);
+    const incorrectTotal = userList.reduce((sum, user) => sum + (Number(user.incorrectAttempts) || 0), 0);
 
     return NextResponse.json({
       visitorCount: visitorMetric,
@@ -26,6 +18,7 @@ export async function GET() {
       incorrectAttempts: incorrectTotal,
     });
   } catch (error) {
+    console.error("Failed to fetch metrics:", error);
     return NextResponse.json({ error: "Failed to fetch metrics" }, { status: 500 });
   }
 }
@@ -33,50 +26,59 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { type, userId } = body;
+    const { type, visitorId } = body;
 
-    if(!body.ok) {
+    if (!body) {
       return NextResponse.json({ error: "Missing request body" }, { status: 400 });
     }
 
-    // Validate req
     if (type !== "correct" && type !== "incorrect") {
       return NextResponse.json({ error: "Invalid increment type" }, { status: 400 });
     }
 
-    if (!userId) {
+    if (!visitorId) {
       return NextResponse.json({ error: "User ID is required" }, { status: 400 });
     }
 
-    const targetColumn = type === "correct" ? "correctAttempts" : "incorrectAttempts";
-    
-    await db.orm.public.User
-      .where((u) => u.id.eq(userId))
-      .update((u: any) => ({
-        [targetColumn]: u[targetColumn].add(1)
-      })).catch((error) => {
-        console.warn("Error updating attempts metric:", error);
-        return;
-      });
+    // get current user
+    const user = await db.orm.public.User
+      .where((u) => u.id.eq(visitorId))
+      .first();
 
-    const updatedUser = await db.orm.public.User
-      .where((u) => u.id.eq(userId))
-      .first().catch((error) => {
-        console.warn("Error fetching updated user:", error);
-        return null;
-      });
+    const currentCorrect = user ? Number(user.correctAttempts) || 0 : 0;
+    const currentIncorrect = user ? Number(user.incorrectAttempts) || 0 : 0;
 
-    if (!updatedUser) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
+    const newCorrectAttempts = type === "correct" ? currentCorrect + 1 : currentCorrect;
+    const newIncorrectAttempts = type === "incorrect" ? currentIncorrect + 1 : currentIncorrect;
 
-    return NextResponse.json({
-      correctAttempts: updatedUser.correctAttempts,
-      incorrectAttempts: updatedUser.incorrectAttempts,
+    const nowIso = new Date().toISOString();
+
+    await db.orm.public.User.where((u) => u.id.eq(visitorId)).upsert({
+      create: {
+        id: visitorId,
+        createdAt: nowIso,
+        updatedAt: nowIso,
+        lastOnline: nowIso,
+        countryOfOrigin: "NaN",
+        correctAttempts: newCorrectAttempts,
+        incorrectAttempts: newIncorrectAttempts,
+        isActive: true,
+        role: "USER",
+      },
+      update: {
+        updatedAt: nowIso,
+        correctAttempts: newCorrectAttempts,
+        incorrectAttempts: newIncorrectAttempts,
+      },
     });
 
-  } catch (error) {
-    console.error("Error modifying attempts metric:", error);
+    return NextResponse.json({
+      correctAttempts: newCorrectAttempts,
+      incorrectAttempts: newIncorrectAttempts,
+    });
+
+  } catch (error: any) {
+    console.error("Error modifying attempts metric:", error?.message, error?.stack);
     return NextResponse.json({ error: "Internal server write error" }, { status: 500 });
   }
 }

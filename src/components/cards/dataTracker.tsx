@@ -22,7 +22,7 @@ export default function DataTrackerCard({ title = "Memory Usage", data }: Props)
   ];
 
   return (
-    <div className="relative flex flex-col justify-between w-full h-full p-5 rounded-2xl bg-[#0d1520]/20text-slate-200">
+    <div className="relative flex flex-col justify-between w-full h-full p-5 rounded-2xl bg-[#0d1520]/20">
       <RadialChart title={title} data={plotData} />
     </div>
   );

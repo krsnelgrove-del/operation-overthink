@@ -1,13 +1,15 @@
-const nextConfig = {
-  async redirects() {
-    return [
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  reactStrictMode: true,
+  images: {
+    remotePatterns: [
       {
-        source: '/',
-        destination: '/home',
-        permanent: true, // Set to true if you want a permanent 308 redirect
+        protocol: 'https',
+        hostname: '**',
       },
-    ]
+    ],
   },
 };
 
-module.exports = nextConfig;
+export default nextConfig;
