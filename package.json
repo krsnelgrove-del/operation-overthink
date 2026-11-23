@@ -3,6 +3,7 @@
   "type": "module",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@12.4.1",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -13,7 +14,6 @@
     "db:seed": "npx tsx --env-file=.env src/prisma/seed.ts"
   },
   "dependencies": {
-    "@js-temporal/polyfill": "^0.5.1",
     "@phosphor-icons/react": "^2.1.10",
     "@prisma/client": "7.10.0",
     "@prisma/orm-extension-supabase": "8.0.0-rc.13",
